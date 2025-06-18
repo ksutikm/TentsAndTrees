@@ -13,7 +13,8 @@ router = APIRouter()
 
 # ======= Входная модель =======
 class SizeRequest(BaseModel):
-    size: int
+    size_n: int
+    size_m: int
 
 # ======= Выходная модель =======
 class GridResponse(BaseModel):
@@ -24,7 +25,7 @@ class GridResponse(BaseModel):
 # ======= FastAPI endpoint =======
 @router.post("/generate", response_model=GridResponse)
 async def generate_grid(request: SizeRequest):
-    grid_obj = GridOptim(request.size)
+    grid_obj = GridOptim(request.size_n, request.size_m)
     return GridResponse(
         grid=grid_obj.grid.tolist(),
         row=grid_obj.row_constraints,
