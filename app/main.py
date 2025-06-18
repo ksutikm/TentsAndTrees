@@ -61,6 +61,7 @@ def register_routers(app: FastAPI) -> None:
     # Подключение роутеров
     app.include_router(root_router, tags=["root"])
     app.include_router(grid_router, tags=["generate"])
+    app.include_router(grid_router, tags=["solve"])
 
 
 

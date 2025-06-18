@@ -16,7 +16,7 @@ class BadGenerationException(Exception):
 
 
 class GridOptim:
-    def __init__(self, n: int, m: int):
+    def __init__(self, n: int, m: int, difficulty: str):
         self.size_n = n
         self.size_m = m
         self.grid = np.zeros((n, m), dtype=int)
@@ -24,7 +24,14 @@ class GridOptim:
         self.empty_cells = {(x, y) for x in range(n) for y in range(m)}
         self._cache_all_neighbours()
 
-        for ratio in np.arange(0.25, 0.17, -0.01):
+        if difficulty == 'easy':
+            ratios = np.arange(0.19, 0.17, -0.01)
+        elif difficulty == 'medium':
+            ratios = np.arange(0.22, 0.17, -0.01)
+        else:
+             ratios = np.arange(0.25, 0.17, -0.01)
+
+        for ratio in ratios:
             self.num_trees = int(ratio * n * m)
             self._reset_grid()
             success = self._place_tents_and_trees()
