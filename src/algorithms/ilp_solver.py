@@ -1,5 +1,5 @@
-from src.grid import get_neighbours
-from src.grid import init_north_south_west_east
+from src.grid.grid_utils import get_neighbours, print_grid
+from src.grid.grid_utils import init_north_south_west_east
 
 import time
 from ortools.sat.python import cp_model
@@ -133,15 +133,36 @@ def ilp_solver(grid, row_constraints, col_constraints):
     print(ans.ResponseStats())
 
     grid = []
+    lst_vars = []
     for i in range(size_n):
         row = []
         for j in range(size_m):
-            tent = ans.Value(tents[i, j])
-            tent = 2 if tent == 1 else tent
-            row.append(tent)
+            row.append(ans.Value(tents[i, j]))
+            lst_vars.append((tents[i, j], ans.Value(tents[i, j])))
         grid.append(row)
 
     for tree in lst_trees:
         grid[tree[0]][tree[1]] = TREE
+        # lst_vars.append((trees[tree], ans.Value(trees[tree])))
+
+    for k, v in north.items():
+        lst_vars.append((north[k], ans.Value(v)))
+
+    for k, v in south.items():
+        lst_vars.append((south[k], ans.Value(v)))
+
+    for k, v in west.items():
+        lst_vars.append((west[k], ans.Value(v)))
+
+    for k, v in east.items():
+        lst_vars.append((east[k], ans.Value(v)))
+
+    file = open('values.txt', 'w')
+    for i in lst_vars:
+        file.write(f'{i[0]} = {i[1]}\n')
+
+    file.close()
+
+    print_grid(grid, row_constraints, col_constraints, tent=1)
 
     return grid

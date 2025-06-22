@@ -2,8 +2,8 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List
 
-from src.grid_optim import GridOptim
-from src.ilp_solver import ilp_solver
+from src.grid.grid import GridOptim
+from src.algorithms.ilp_solver import ilp_solver
 
 router = APIRouter()
 

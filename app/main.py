@@ -6,7 +6,7 @@ from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
-from app.grid import router as grid_router
+from app.grid_router import router as grid_router
 
 
 @asynccontextmanager
