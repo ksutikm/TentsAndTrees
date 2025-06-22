@@ -5,7 +5,6 @@ from collections import deque
 import numpy as np
 
 from src.grid.greedy_init import GreedyInitializer
-from src.grid.grid import print_grid
 
 EMPTY: int = 0
 GRASS: int = 1
@@ -280,19 +279,6 @@ class LocalSearch:
 
         trees = [(i, tree) for i, tree in enumerate(trees)]
 
-
-        # current_tents = self.smart_initialization()
-
-        # current_tents = []
-        # for tree in self.trees:
-        #     options = self.get_neighbors(tree, set(current_tents))
-        #     if not options:
-        #         return None
-        #     tent = random.choice(options)
-        #     current_tents.append(tent)
-        #
-        # trees = [(i, tree) for i, tree in enumerate(self.trees)]
-
         best_tents = current_tents[:]
         best_score = self.evaluate(best_tents)
         max_score = best_score
@@ -303,7 +289,6 @@ class LocalSearch:
 
         row_counts = self.row_counts[:]
         col_counts = self.col_counts[:]
-        # self.print_grid(current_tents)
 
         for _ in range(self.max_iters*10):
             if stagnation >= max_stagnation:
@@ -315,13 +300,9 @@ class LocalSearch:
 
             for i, tree in trees:
                 current_tent = current_tents[i]
-                # occupied = set(current_tents)
-                # occupied.remove(current_tent)
-                # neighbors = self.get_neighbors(tree, occupied)
                 neighbors = self.get_neighbors(tree, current_tents)
 
                 for candidate in neighbors:
-                    # Aspiration: разрешить, если лучше текущего best_score
                     if (i, candidate) in tabu_list and current_score <= best_score:
                         continue
 
@@ -336,13 +317,6 @@ class LocalSearch:
                         row_counts_tmp,
                         col_counts_tmp
                     )
-
-                    # print(f'new_score = {new_score}')
-                    # new_tents = current_tents[:]
-                    # new_tents[i] = candidate
-                    # # print(f'eva = {self.evaluate(new_tents, None)}')
-                    # if new_score != self.evaluate(new_tents):
-                    #     print(f'new_score = {new_score} eva = {self.evaluate(new_tents)}')
 
                     self.eva += 1
                     if not new_score:
@@ -371,8 +345,6 @@ class LocalSearch:
                 best_score = current_score
                 best_tents = current_tents[:]
                 stagnation = 0
-                # print(f"New best score: {best_score}")
-                # self.print_grid(best_tents)
             else:
                 stagnation += 1
 
@@ -381,23 +353,11 @@ class LocalSearch:
                 break
 
         self.last_tents = best_tents[:]
-        # print(f'eva = {self.evaluate(best_tents)}')
         self.max_score = max_score
         self.best_score = best_score
         return best_tents
 
     def tabu_search2(self, row_limits, col_limits, tabu_size=50):
-        # current_tents = self.smart_initialization()
-
-        # current_tents = []
-        # for tree in self.trees:
-        #     # options = self.get_neighbors(tree, occupied)
-        #     options = self.get_neighbors(tree, set(current_tents))
-        #     if not options:
-        #         return None
-        #     tent = random.choice(options)
-        #     current_tents.append(tent)
-
         for _ in range(5):
             initializer = GreedyInitializer(self.grid.copy(), row_limits[:], col_limits[:])
             trees, current_tents = initializer.initialize()
@@ -424,7 +384,6 @@ class LocalSearch:
 
             for i, tree in trees:
                 current_tent = current_tents[i]
-                # temp_occupied = set(current_tents) - {current_tent}
                 neighbors = self.get_neighbors(tree, current_tents)
 
                 for candidate in neighbors:
@@ -435,11 +394,8 @@ class LocalSearch:
                     test_tents[i] = candidate
                     score = self.delta_evaluate(current_tents, current_tent, candidate, best_score,
                                                 row_counts[:], col_counts[:])
-                    # score = self.evaluate(current_tents)
-                    # print(f'new_score = {new_score}')
                     new_tents = current_tents[:]
                     new_tents[i] = candidate
-                    # print(f'eva = {self.evaluate(new_tents, None)}')
                     if score != self.evaluate(new_tents):
                         print(f'new_score = {score} eva = {self.evaluate(new_tents)}')
 
@@ -450,7 +406,6 @@ class LocalSearch:
                         row_counts[candidate[0]] += 1
                         col_counts[candidate[1]] += 1
                         best_candidate_score = score
-                        # print(score)
                         self.best_score = score
                         best_candidate = (i, candidate, test_tents)
 
@@ -461,7 +416,6 @@ class LocalSearch:
             tabu_list.append((i, candidate))
             current_tents = new_tents
             if best_candidate_score < best_score:
-                # print(best_candidate_score)
                 best_score = best_candidate_score
                 best_tents = current_tents[:]
 
@@ -499,24 +453,12 @@ class LocalSearch:
             random.shuffle(trees)
 
             for i, tree in trees:
-                # print(f'cnt_trees = {len(trees)}')
-                # print(f'cnt_tents = {len(tents)}')
                 current_tent = tents[i]
-                # occupied = set(tents)
-                # occupied.remove(current_tent)
-                # neighbors = self.get_neighbors(tree, occupied)
                 neighbors = self.get_neighbors(tree, tents)
 
                 for candidate in neighbors:
-                    # new_tents = tents[:]
-                    # new_tents[i] = candidate
-                    # score = new_score = self.evaluate(tents)
                     score = self.delta_evaluate(tents, current_tent, candidate, best_score,
                                                 row_counts[:], col_counts[:])
-                    # new_tents = tents[:]
-                    # new_tents[i] = candidate
-                    # if score != self.evaluate(new_tents):
-                    #     print(f'new_score = {score} eva = {self.evaluate(new_tents)}')
                     self.eva += 1
                     if score < best_score:
                         stagnation = 0
@@ -531,12 +473,10 @@ class LocalSearch:
                     else:
                         stagnation += 1
 
-            # print(f'best_score = {best_score}')
             if best_score == 0:
                 self.last_tents = tents[:]
                 self.max_score = max_score
                 self.best_score = best_score
-                # self.print_grid(tents)
                 return tents
             if not improved:
                 break
@@ -562,7 +502,6 @@ class LocalSearch:
         best_tents = current_tents[:]
         best_score = self.evaluate(best_tents)
         max_score = best_score
-        # print(max_score)
         current_score = best_score
         temperature = initial_temperature
 
@@ -595,7 +534,6 @@ class LocalSearch:
             )
             new_tents = current_tents[:]
             new_tents[i] = candidate
-            # # print(f'eva = {self.evaluate(new_tents, None)}')
             if new_score != self.evaluate(new_tents):
                 print(f'new_score = {new_score} eva = {self.evaluate(new_tents)}')
 
@@ -610,7 +548,6 @@ class LocalSearch:
                     accept = True
 
             if accept:
-                # Обновление in-place
                 current_tents[i] = candidate
                 x1, y1 = current_tent
                 x2, y2 = candidate
@@ -624,8 +561,6 @@ class LocalSearch:
                     best_score = new_score
                     best_tents = current_tents[:]
                     stagnation = 0
-                    # print(f'best_score = {best_score}')
-                    # self.print_grid(current_tents)
                 else:
                     stagnation += 1
             else:
@@ -787,14 +722,6 @@ class LocalSearch:
         self.best_score = best_score
         return best_overall
 
-    def print_grid(self, tents):
-        occupied = set(tents)
-        print('-' * 50)
-        grid = self.grid.copy()
-        for tent in occupied:
-            grid[tent[0]][tent[1]] = TENT
-        print_grid(grid, self.row_counts, self.col_counts)
-
     def solve(self, row_limits, col_limits, restarts=10, method="local", random_init=True):
             best_global_score = float('inf')
             best_global_solution = None
@@ -817,21 +744,14 @@ class LocalSearch:
 
                 # Если решение найдено
                 if solution is not None:
-                    # score = self.evaluate(solution)
-                    # print("✅ Found solution!")
                     if self.best_score == 0:
-                        # print("🎯 Perfect solution.")
-                        # self.print_grid(solution)
                         return solution, self.best_score, self.max_score, self.eva, attempt
                     elif self.best_score < best_global_score:
                         best_global_score = self.best_score
                         best_global_solution = solution[:]
                         best_global_evaluation_count = self.eva
                         best_global_max_score = self.max_score
-                # else:
-                # print("❌ Method returned None.")
 
-            # print("⚠️ No perfect solution found. Returning best attempt.")
             return best_global_solution, best_global_score, best_global_max_score, best_global_evaluation_count, restarts
 
     def get_trees(self, step):

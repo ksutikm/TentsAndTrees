@@ -1,10 +1,10 @@
 import time
 
 import statistics
-from TentsAndTrees.src.algorithms.backtracking_solver import BacktrackSolver
-from TentsAndTrees.src.algorithms.ilp_solver import ilp_solver
-from TentsAndTrees.src.algorithms.metaheuristics import LocalSearch
-from TentsAndTrees.src.grid.grid import GridOptim
+from src.algorithms.backtracking_solver import BacktrackSolver
+from src.algorithms.ilp_solver import ilp_solver
+from src.algorithms.metaheuristics import LocalSearch
+from src.grid.grid import GridOptim
 
 
 def timer(func):
